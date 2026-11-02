@@ -1,0 +1,4 @@
+dist/
+node_modules/
+# The global "Icon?" rule matches this directory on macOS.
+!icons/
