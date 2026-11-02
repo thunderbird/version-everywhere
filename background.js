@@ -12,14 +12,45 @@ const ACTIONS = [
   messenger.messageDisplayAction,
 ];
 
+const FETCH_TIMEOUT_MS = 5000;
+
 let labelPromise = null;
+
+// Gets the latest Release version from product-details.mozilla.org. If the
+// request fails, uses the last value that a request returned.
+async function getLatestRelease() {
+  try {
+    const response = await fetch(PRODUCT_DETAILS_URL, {
+      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    const latestRelease = parseLatestRelease(await response.json());
+    if (!latestRelease) {
+      throw new Error("LATEST_THUNDERBIRD_VERSION is missing");
+    }
+    await messenger.storage.local.set({ latestRelease });
+    return latestRelease;
+  } catch (error) {
+    console.warn("Version Everywhere: cannot get the latest Release version", error);
+    const { latestRelease = null } = await messenger.storage.local.get("latestRelease");
+    return latestRelease;
+  }
+}
 
 function getLabelInfo() {
   if (!labelPromise) {
-    labelPromise = messenger.runtime.getBrowserInfo().then(({ version }) => ({
-      label: formatLabel(version),
-      icon: CHANNELS[detectChannel(version)].icon,
-    }));
+    labelPromise = (async () => {
+      const { version } = await messenger.runtime.getBrowserInfo();
+      const channel = detectChannel(version);
+      // Only ".0" versions need the network request.
+      const latestRelease = channel === "releaseOrBeta" ? await getLatestRelease() : null;
+      return {
+        label: formatLabel(version, latestRelease),
+        icon: CHANNELS[detectChannel(version, latestRelease)].icon,
+      };
+    })();
   }
   return labelPromise;
 }

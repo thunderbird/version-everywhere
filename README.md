@@ -1,6 +1,6 @@
 # version-everywhere
 
-A Thunderbird Desktop add-on that shows the update channel and version number in every window and tab, for example `ESR 153.6.0`, `Beta 155.0b2`, `Release 154.0.1`, or `Daily 156.0a1`. It supports Thunderbird 140 and later.
+A Thunderbird Desktop add-on that shows the update channel and version number in every window and tab, for example `ESR 153.6.0`, `Beta 160.0`, `Release 159.0.1`, or `Daily 161.0a1`. It supports Thunderbird 140 and later.
 
 ## Where the label is
 
@@ -9,18 +9,20 @@ A Thunderbird Desktop add-on that shows the update channel and version number in
 - A toolbar button in the message display toolbar.
 - A prefix on the title of every window, for example `[ESR 153.6.0] Inbox`.
 
-Each channel has its own icon color and letter: green E for ESR, blue R for Release, purple B for Beta, and red D for Daily.
+Each channel has its own icon color and letter: green E for ESR, blue R for Release, purple B for Beta, and red D for Daily. A gray question mark means Release or Beta.
 
 ## How the add-on finds the channel
 
-Add-ons cannot read the update channel, so the add-on uses the version string:
+Add-ons cannot read the update channel. The version that add-ons get also hides the `esr` and beta suffixes. For example, ESR 153.6.0esr shows as `153.6.0`, and Beta 160.0b2 shows as `160.0`. The add-on uses these rules:
 
-| Version pattern | Channel |
+| Version | Channel |
 | --- | --- |
-| Contains `a`, for example `156.0a1` | Daily |
-| Contains `b`, for example `155.0b2` | Beta |
+| Contains `a`, for example `161.0a1` | Daily |
 | Minor number is more than 0, for example `153.6.0` | ESR |
-| Minor number is 0, for example `154.0.1` | Release |
+| Minor number is 0, and the major version is newer than the latest Release, for example `160.0` | Beta |
+| Minor number is 0, and the major version is not newer than the latest Release, for example `159.0.1` | Release |
+
+To get the latest Release version, the add-on reads `thunderbird_versions.json` from product-details.mozilla.org at startup. The request sends no user data. If the request fails, the add-on uses the last version that it received. If it never received a version, the label says `Release or Beta 160.0` with a gray icon.
 
 The first builds of an ESR major version (for example `153.0` and `153.0.1`) show as Release, because they look the same as Release builds.
 

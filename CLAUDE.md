@@ -19,11 +19,12 @@ A Thunderbird Desktop add-on (Manifest V3) that shows the update channel and ver
 
 `channel.js` holds the pure logic: `detectChannel(version)`, `formatLabel(version)`, and the `CHANNELS` table that maps each channel to a name and an icon. It is a plain script, not a module. The add-on loads it as a background script, so its functions are globals in `background.js`. Node.js loads it through the `module.exports` guard at the end of the file, so that the tests can use it.
 
-`background.js` reads the version with `messenger.runtime.getBrowserInfo()`. It sets the label, title, and icon on three toolbar buttons: `action` (main window, all spaces through `allowed_spaces: []`), `composeAction`, and `messageDisplayAction`. It also sets `titlePreface` on every window through `windows.update()`, and on each new window through `windows.onCreated`. The background is an event page, so listeners must stay at the top level.
+`background.js` reads the version with `messenger.runtime.getBrowserInfo()`. For a `.0` version, it also fetches the latest Release version from product-details.mozilla.org and keeps the last good value in `storage.local` for offline use. It sets the label, title, and icon on three toolbar buttons: `action` (main window, all spaces through `allowed_spaces: []`), `composeAction`, and `messageDisplayAction`. It also sets `titlePreface` on every window through `windows.update()`, and on each new window through `windows.onCreated`. The background is an event page, so listeners must stay at the top level.
 
 ## Constraints
 
 - Use only standard WebExtension APIs. Experiment APIs are not permitted.
 - Support ESR 140.x, ESR 153.x, and all later versions (`strict_min_version` is `140.0`).
-- `getBrowserInfo()` returns ESR versions without the `esr` suffix (tested on 153.6.0). The channel comes only from the version string. The first builds of an ESR major version (`153.0`, `153.0.1`) show as Release, and this gap is accepted.
+- `getBrowserInfo()` hides the `esr` suffix (ESR 153.6.0 returns `153.6.0`) and the beta suffix (Beta 160.0b2 returns `160.0`). Only Daily keeps its suffix (`161.0a1`). A `.0` version is Beta if its major version is newer than `LATEST_THUNDERBIRD_VERSION` from product-details.mozilla.org, and Release if not. If that value is not known, the label is `Release or Beta`.
+- The first builds of an ESR major version (`153.0`, `153.0.1`) show as Release, and this gap is accepted.
 - Icon colors must give a WCAG 2.1 AA contrast ratio of 4.5:1 or more with white text. If you change a color in `icons/`, compute the ratio again.
