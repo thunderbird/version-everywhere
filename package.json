@@ -1,0 +1,11 @@
+{
+  "name": "version-everywhere",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Thunderbird add-on that shows the channel and version in every window and tab.",
+  "license": "MPL-2.0",
+  "scripts": {
+    "test": "node --test",
+    "build": "mkdir -p dist && rm -f dist/version-everywhere.xpi && zip -r dist/version-everywhere.xpi manifest.json background.js channel.js icons"
+  }
+}
