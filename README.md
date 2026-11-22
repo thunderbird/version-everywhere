@@ -2,6 +2,17 @@
 
 A Thunderbird Desktop add-on that shows the update channel and version number in every window and tab, for example `ESR 153.6.0`, `Beta 160.0`, `Release 159.0.1`, or `Daily 161.0a1`. It supports Thunderbird 140 and later.
 
+## Install
+
+The add-on is not on addons.thunderbird.net and is not signed. Thunderbird does not require signed add-ons, so you can install the unsigned file.
+
+1. Download `version-everywhere.xpi` from the [latest release](https://github.com/thunderbird/version-everywhere/releases/latest).
+2. In Thunderbird, open the app menu ☰ and click **Add-ons and Themes**.
+3. Click the gear icon, and click **Install Add-on From File**.
+4. Pick the downloaded `version-everywhere.xpi`, and click **Add**.
+
+To remove the add-on, open **Add-ons and Themes**, click the **...** button next to version-everywhere, and click **Remove**.
+
 ## Where the label is
 
 - A toolbar button in the main window, in all spaces (mail, calendar, tasks, address book, and others).
